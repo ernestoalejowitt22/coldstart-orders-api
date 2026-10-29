@@ -1,0 +1,31 @@
+name: Release-proof gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  release-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Start the API
+        run: |
+          npm start &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/health && exit 0; sleep 1; done
+          exit 1
+      - name: Run release-proof cases
+        env:
+          RELEASETWIN_API_URL: https://api.releasetwin.com
+          RELEASETWIN_API_TOKEN: ${{ secrets.RELEASETWIN_API_TOKEN }}
+          API_BASE_URL: http://localhost:3000
+        run: |
+          docker run --rm --network host -v "$PWD:/workspace" \
+            -e RELEASETWIN_API_URL -e RELEASETWIN_API_TOKEN -e API_BASE_URL \
+            ghcr.io/ernestoalejowitt22/releasetwin/cli:0.4.0 run /workspace/cases
