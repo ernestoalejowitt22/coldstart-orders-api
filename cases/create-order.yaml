@@ -1,0 +1,17 @@
+id: ORDERS-1
+oracle:
+  locator: README.md
+fixture:
+  locator: new-order.json
+  sha256: 21d8d9c00b07ec494697a3102caf76bd0e93c13508e3b82fa2879bd01441cbdb
+pipeline:
+  - operation: http.request
+    with:
+      method: POST
+      url: ${API_BASE_URL}/orders
+      # Inline YAML numbers are sent as strings by CLI 0.4.0, so the body is a JSON string.
+      body: '{"productId":123,"quantity":2}'
+  - operation: http.assertJsonPath
+    with:
+      path: $.status
+      expected: confirmed
