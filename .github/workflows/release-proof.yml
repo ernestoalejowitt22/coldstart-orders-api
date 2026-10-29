@@ -25,7 +25,8 @@ jobs:
           RELEASETWIN_API_URL: https://api.releasetwin.com
           RELEASETWIN_API_TOKEN: ${{ secrets.RELEASETWIN_API_TOKEN }}
           API_BASE_URL: http://localhost:3000
+          RELEASETWIN_EVIDENCE: "on"
         run: |
           docker run --rm --network host -v "$PWD:/workspace" \
-            -e RELEASETWIN_API_URL -e RELEASETWIN_API_TOKEN -e API_BASE_URL \
+            -e RELEASETWIN_API_URL -e RELEASETWIN_API_TOKEN -e API_BASE_URL -e RELEASETWIN_EVIDENCE \
             ghcr.io/ernestoalejowitt22/releasetwin/cli:0.4.0 run /workspace/cases
